@@ -1,7 +1,5 @@
 package com.cines.pueblo.model;
 
-import java.time.LocalDate;
-
 import org.springframework.stereotype.Component;
 
 
@@ -16,6 +14,7 @@ public class EntradaDTO {
 	private int ent_fila;
 	private int ent_numero;
 	private String idCliente;
+	
 	public EntradaDTO() {
 		super();
 	}

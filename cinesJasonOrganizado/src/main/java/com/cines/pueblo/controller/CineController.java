@@ -81,7 +81,9 @@ public class CineController {
 //		throw new DomainException("Mensaje de pruebas");
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		c.setId_cine(0);
-		if (cDao.insert(c)) {
+		c=cDao.insert(c);
+		if (c!=null) {
+			System.out.println("En alta-" + c.toString());
 			map.put("status", 1);
 			map.put("message", "Registro salvado");
 			return new ResponseEntity<>(map, HttpStatus.OK);

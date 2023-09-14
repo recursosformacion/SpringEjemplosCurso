@@ -12,7 +12,7 @@ import com.cines.pueblo.exception.DomainException;
 @Service
 public interface  IServicio<T, S> {
 
-	public boolean insert(T t);
+	public T insert(T t);
 	public boolean update(T t) throws DomainException, DAOException ;
 	public boolean deleteById(S s);
 	public List<T> listAll();

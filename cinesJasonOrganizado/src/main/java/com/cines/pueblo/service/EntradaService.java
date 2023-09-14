@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.cines.pueblo.exception.DAOException;
 import com.cines.pueblo.exception.DomainException;
-import com.cines.pueblo.model.Cine;
 import com.cines.pueblo.model.Entrada;
 import com.cines.pueblo.repository.IEntrada;
 import com.cines.pueblo.service.interfaces.IServicio;
@@ -22,8 +21,8 @@ public class EntradaService implements IServicio<Entrada, Long> {
 	private IEntrada entradaRepository;
 
 	@Override
-	public boolean insert(Entrada entrada) {
-		return entradaRepository.save(entrada) != null;
+	public Entrada insert(Entrada entrada) {
+		return entradaRepository.save(entrada);
 	}
 	@Override
 	public List<Entrada> listAll() {
@@ -46,7 +45,7 @@ public class EntradaService implements IServicio<Entrada, Long> {
 		entradaDB.setIdCliente(Rutinas.nuevoSiNoVacio(entradaDB.getIdCliente(), entrada.getIdCliente()));
 		entradaDB.setEnt_numero(Rutinas.nuevoSiNoVacio(entradaDB.getEnt_numero(), entrada.getEnt_numero()));
 		//entradaDB.setEnt_fecha(Rutinas.nuevoSiNoVacio(entradaDB.getEnt_fecha(), entrada.getEnt_fecha()));
-		entradaDB.setEnt_cine((Cine)Rutinas.nuevoSiNoVacio(entradaDB.getEnt_cine(), entrada.getEnt_cine()));
+		entradaDB.setEnt_cine(Rutinas.nuevoSiNoVacio(entradaDB.getEnt_cine(), entrada.getEnt_cine()));
 
 		return entradaRepository.save(entradaDB) != null;
 	}

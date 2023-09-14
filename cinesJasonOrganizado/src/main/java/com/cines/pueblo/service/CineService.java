@@ -23,13 +23,14 @@ public class CineService implements IServicio<Cine, Long> {
 	private ICine cineRepository;
 
 	@Override
-	public boolean insert(Cine cine) {
-		List<Entrada> list_entradas = cine.getCi_lista();
+	public Cine insert(Cine cine) {
+		List<Long> list_entradas = cine.getCi_lista();
 		if (Rutinas.isEmptyOrNull(list_entradas)) {		
-			list_entradas = new ArrayList<Entrada>();
+			list_entradas = new ArrayList<Long>();
 		}
 		cine.setCi_lista(list_entradas);
-		return cineRepository.save(cine) != null;
+		
+		return cineRepository.save(cine);
 	}
 
 	@Override
@@ -71,16 +72,16 @@ public class CineService implements IServicio<Cine, Long> {
 
 	public boolean addEntrada(Entrada entrada) throws DomainException, DAOException {
 
-		Optional<Cine> cineDBO = cineRepository.findById(entrada.getEnt_cine().getId_cine());
+		Optional<Cine> cineDBO = cineRepository.findById(entrada.getEnt_cine());
 		if (cineDBO.isEmpty()) {
 			throw new DAOException("El registro ya no existe");
 		}
 		Cine cineDB = cineDBO.get();
-		List<Entrada> list_entradas = cineDB.getCi_lista();
+		List<Long> list_entradas = cineDB.getCi_lista();
 		if (Rutinas.isEmptyOrNull(list_entradas)) {		
-			list_entradas = new ArrayList<Entrada>();
+			list_entradas = new ArrayList<Long>();
 		}
-		list_entradas.add(entrada);
+		list_entradas.add(entrada.getId_entrada());
 		cineDB.setCi_lista(list_entradas);
 
 		return cineRepository.save(cineDB) != null;

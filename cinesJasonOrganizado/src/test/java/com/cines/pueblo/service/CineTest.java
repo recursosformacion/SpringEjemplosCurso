@@ -25,8 +25,8 @@ public class CineTest {
 		Cine cine = new Cine();
 		cine.setId_cine(0l);
 		cine.setCi_nombre("Las pruebas");
-		boolean guardado = cDao.insert(cine);
-		assertTrue(guardado);
+		Cine cineSalvado = cDao.insert(cine);
+		assertTrue(cineSalvado!=null);
 	}
 	
 }

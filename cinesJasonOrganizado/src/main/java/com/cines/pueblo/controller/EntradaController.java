@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.grammars.hql.HqlParser.IsNullPredicateContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -106,8 +105,9 @@ public class EntradaController {
 		
 		
 		System.out.println("En alta-" + e.toString());
-		if (cDao.insert(e)) {
-			System.out.println("En alta dada-" + e.toString());
+		e=cDao.insert(e);
+		if (e !=null) {
+			System.out.println("En alta dada-" + e.getId_entrada() + "/" + e.toString());
 			cDaoCine.addEntrada(e);
 			//throw new DomainException("Mensaje de pruebas");
 			return ResponseEntity.ok(e);
@@ -168,7 +168,7 @@ public Entrada convertirDTO(EntradaDTO d) throws ControllerException {
 		e.setIdCliente(d.getIdCliente());
 		Optional<Cine> cineDB = (Optional<Cine>) cDaoCine.leerUno(d.getId_cine());
 		if (cineDB.isPresent()) {
-			e.setEnt_cine(cineDB.get());
+			e.setEnt_cine(cineDB.get().getId_cine());
 		} else {
 			throw new ControllerException("Cine no existe - " + d.getId_cine());
 		}

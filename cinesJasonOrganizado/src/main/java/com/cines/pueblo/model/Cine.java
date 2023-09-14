@@ -2,26 +2,17 @@ package com.cines.pueblo.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import com.cines.pueblo.service.util.Rutinas;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "Cine")
+@Table(name = "CinePlano")
 public class Cine {
 
 	@Id
@@ -40,14 +31,8 @@ public class Cine {
 	@Column(nullable = false)
 	private int ci_capacidad;
 	
-	@Transient
-	private List<Long> ci_listaNumer;
-	
-	//JsonIgnore
-	//JsonBackReference
-	@JsonManagedReference
-	@OneToMany(mappedBy = "ent_cine", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<Entrada> ci_lista;
+	@ElementCollection
+	private List<Long> ci_lista;
 
 	
 	
@@ -56,7 +41,7 @@ public class Cine {
 		super();
 	}
 
-	public Cine(long id_cine, String ci_nombre, int ci_capacidad, List<Entrada> ci_lista) {
+	public Cine(long id_cine, String ci_nombre, int ci_capacidad, List<Long> ci_lista) {
 		super();
 		this.id_cine = id_cine;
 		this.ci_nombre = ci_nombre;
@@ -93,17 +78,17 @@ public class Cine {
 		return "Cine [id_cine=" + id_cine + ", ci_nombre=" + ci_nombre + ", ci_capacidad=" + ci_capacidad + "]";
 	}
 	
-	public String toJson() throws JsonProcessingException {
-		
-		String com="\"";
-		String salida="";
-		salida+=com+"id_cine"+com+":"+id_cine+",";
-		salida+=com+"ci_nombre"+com+":"+ci_nombre+",";
-		salida+=com+"ci_calle"+com+":"+ci_calle+",";
-		salida+=com+"ci_barrio"+com+":"+ci_barrio+",";
-		salida+=com+"ci_capacidad"+com+":"+ci_capacidad;
-		return salida;
-	}
+//	public String toJson() throws JsonProcessingException {
+//		
+//		String com="\"";
+//		String salida="";
+//		salida+=com+"id_cine"+com+":"+id_cine+",";
+//		salida+=com+"ci_nombre"+com+":"+ci_nombre+",";
+//		salida+=com+"ci_calle"+com+":"+ci_calle+",";
+//		salida+=com+"ci_barrio"+com+":"+ci_barrio+",";
+//		salida+=com+"ci_capacidad"+com+":"+ci_capacidad;
+//		return salida;
+//	}
 
 	public String getCi_calle() {
 		return ci_calle;
@@ -121,23 +106,14 @@ public class Cine {
 		this.ci_barrio = ci_barrio;
 	}
 
-	public List<Entrada> getCi_lista() {
+	public List<Long> getCi_lista() {
 		return ci_lista;
 	}
 
-	public void setCi_lista(List<Entrada> ci_lista) {
+	public void setCi_lista(List<Long> ci_lista) {
 		if (Rutinas.isEmptyOrNull(ci_lista)) {
-			ci_lista = new ArrayList<Entrada>();
+			ci_lista = new ArrayList<Long>();
 		}
 		this.ci_lista = ci_lista;
-	}
-	
-	public List<Long> ci_listaNumer(List<Entrada> ci_lista) {
-		System.out.println("entrando1");
-		if (Rutinas.isEmptyOrNull(ci_lista)) {
-			ci_lista = new ArrayList<Entrada>();
-		}
-		System.out.println("entrando");
-		return ci_lista.stream().map(e->e.getId_entrada()).collect(Collectors.toList());
 	}
 }

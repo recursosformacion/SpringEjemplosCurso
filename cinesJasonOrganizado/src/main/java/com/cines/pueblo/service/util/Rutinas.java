@@ -30,7 +30,15 @@ public class Rutinas {
 		}
 	}
 	
-	static public long nuevoSiNoVacio(long valorActual, long valorNuevo) {
+	static public Long nuevoSiNoVacio(long valorActual, long valorNuevo) {
+		if (Objects.nonNull(valorNuevo)) {
+			return valorNuevo;
+		} else {
+			return valorActual;
+		}
+	}
+	
+	static public Long nuevoSiNoVacio(Long valorActual, Long valorNuevo) {
 		if (Objects.nonNull(valorNuevo)) {
 			return valorNuevo;
 		} else {
