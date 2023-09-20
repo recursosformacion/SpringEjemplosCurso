@@ -1,20 +1,25 @@
 package com.cines.pueblo.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,9 +35,6 @@ import com.cines.pueblo.model.Entrada;
 import com.cines.pueblo.model.EntradaDTO;
 import com.cines.pueblo.service.CineService;
 import com.cines.pueblo.service.EntradaService;
-import com.cines.pueblo.validate.EntradaDTOValidate;
-
-import jakarta.validation.Valid;
 
 @CrossOrigin
 @RestController
@@ -45,24 +47,42 @@ public class EntradaController {
 	@Autowired
 	private CineService cDaoCine;
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-		binder.setValidator(new EntradaDTOValidate());
+	public static Link createLink(Entrada c) throws ControllerException {
+		return EntradaController.createLink(c, "self");
+	}
+
+	public static Link createLink(Entrada c, String entrada) throws ControllerException {
+		Link linkSelf;
+		linkSelf = WebMvcLinkBuilder.linkTo(methodOn(EntradaController.class).leerUno(c.getId_entrada()))
+				.withRel(entrada);
+		return linkSelf;
+	}
+
+	public static EntityModel<Entrada> createEntradaResource(Entrada c) {
+
+		EntityModel<Entrada> entityModel = EntityModel.of(c);
+		try {
+			entityModel.add(EntradaController.createLink(c));
+			Cine cine = new Cine();
+			cine.setId_cine(c.getEnt_cine());
+			entityModel.add(CineController.createLink(cine,"ent_cine"));
+		} catch (ControllerException e) {
+			e.printStackTrace();
+		} finally {
+		}
+		return entityModel;
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Map<String, Object>> leerUno(@PathVariable("id") String ids) throws ControllerException {
+	public EntityModel<Entrada> leerUno(@PathVariable("id") Long id) throws ControllerException {
 		String mensaje = "";
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		if (ids != null) {
+		if (id != null) {
 			try {
-				Long id = Long.parseLong(ids);
+
 				Optional<Entrada> entradaDB = (Optional<Entrada>) cDao.leerUno(id);
 
 				if (entradaDB.isPresent()) {
-					map.put("status", 1);
-					map.put("data", entradaDB.get());
-					return new ResponseEntity<>(map, HttpStatus.OK);
+					return EntradaController.createEntradaResource(entradaDB.get());
 				} else {
 					mensaje = "No existen datos";
 				}
@@ -77,18 +97,17 @@ public class EntradaController {
 	}
 
 	@GetMapping({ "", "/" })
-	public ResponseEntity<Map<String, Object>> leerTodos() throws ControllerException {
+	public CollectionModel<EntityModel<Entrada>> leerTodos() throws ControllerException {
 
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		List<Entrada> cat = cDao.listAll();
-
-		if (!cat.isEmpty()) {
-			map.put("status", 1);
-			map.put("data", cat);
-			return new ResponseEntity<>(map, HttpStatus.OK);
+		List<Entrada> entradas = cDao.listAll();
+		if (!entradas.isEmpty()) {
+			List<EntityModel<Entrada>> entradasE = entradas.stream()
+					.map(entrada -> EntradaController.createEntradaResource(entrada))
+					.collect(Collectors.toList());
+			return CollectionModel.of(entradasE, 
+					linkTo(methodOn(EntradaController.class)).withSelfRel());
 		} else {
 			throw new ControllerException("No existen datos");
-
 		}
 	}
 
@@ -105,7 +124,7 @@ public class EntradaController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Entrada> alta(@Validated @RequestBody EntradaDTO c)
+	public ResponseEntity<Entrada> alta(@RequestBody EntradaDTO c)
 			throws DomainException, ControllerException, DAOException { // ID,NOMBRE,DESCRIPCION
 
 //		throw new DomainException("Mensaje de pruebas");
